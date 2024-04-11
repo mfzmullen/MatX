@@ -1173,7 +1173,6 @@ void fprint(FILE* fp, const Op &op, Args... dims) {
   std::apply([&](auto &&...args) { fprint(fp, op, args...); }, tp);
 }
 
-#define print(op, ...) fprint(stdout, op, ##__VA_ARGS__)
 #endif
 
 template <typename Op>
