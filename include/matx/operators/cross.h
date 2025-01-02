@@ -53,14 +53,14 @@ namespace matx
     }
 
     template<int Start, int End, typename... Args, std::size_t... I>
-    auto slice_impl(std::index_sequence<I...>, Args&&... args) {
+    auto array_slice_impl(std::index_sequence<I...>, Args&&... args) {
         return cuda::std::make_tuple(cuda::std::get<Start + I>(cuda::std::forward_as_tuple(args...))...);
     }
 
     template<int Start, int End, typename... Args>
-    auto slice(Args&&... args) {
+    auto array_slice(Args&&... args) {
         static_assert(Start >= 0 && End >= 0 && Start <= End, "Invalid slice indices");
-        return get_array_from_tuple(slice_impl<Start, End>(std::make_index_sequence<End - Start>{}, std::forward<Args>(args)...));
+        return get_array_from_tuple(array_slice_impl<Start, End>(std::make_index_sequence<End - Start>{}, std::forward<Args>(args)...));
     }
 
     template <typename OpA, typename OpB>
@@ -106,10 +106,32 @@ namespace matx
         __MATX_INLINE__ __MATX_DEVICE__ __MATX_HOST__ decltype(auto) operator()(Is... indices) const
         {
           cuda::std::array idx{indices...};
-          cuda::std::array idxB{indices...};
           
-          cuda::std:array idxA = slice<out_rank-OpA::RANK(),out_rank>(idx);
-          cuda::std:array idxB = slice<out_rank-OpB::RANK(),out_rank>(idx);
+          cuda::std:array idxA = array_slice<out_rank-OpA::Rank(),out_rank>(idx);
+          cuda::std:array idxB = array_slice<out_rank-OpB::Rank(),out_rank>(idx);
+
+          //create references to individual slices for ease of notation
+          cuda::std::array idxA0 = idxA;
+          cuda::std::array idxA1 = idxA;
+          cuda::std::array idxA2 = idxA;
+
+          idxA0[OpA::Rank() - 1] = 0;
+          idxA1[OpA::Rank() - 1] = 1;
+          idxA2[OpA::Rank() - 1] = 2;
+
+          //create references to individual slices for ease of notation
+          cuda::std::array idxB0 = idxB;
+          cuda::std::array idxB1 = idxB;
+          cuda::std::array idxB2 = idxB;
+
+          idxB0[OpB::Rank() - 1] = 0;
+          idxB1[OpB::Rank() - 1] = 1;
+          idxB2[OpB::Rank() - 1] = 2;
+
+          auto result = concat(out_rank, get_value(a_,idxA1) * get_value(b_,idxB2) - get_value(a_,idxA2) * get_value(b_,idxB1)
+                                        , get_value(a_,idxA2) * get_value(b_,idxB0) - get_value(a_,idxA0) * get_value(b_,idxB2)
+                                        , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
+          )
 
           return get_value(a_, idxA) * get_value(b_, idxB);
         }
