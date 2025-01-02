@@ -133,7 +133,7 @@ namespace matx
                                         , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
           )
 
-          return get_value(a_, idxA) * get_value(b_, idxB);
+          return result;
         }
 
         static __MATX_INLINE__ constexpr __MATX_HOST__ __MATX_DEVICE__ int32_t Rank()
