@@ -43,6 +43,26 @@ namespace matx
    * Returns the polynomial evaluated at each point
    */
   namespace detail {
+
+    //pulled from here: https://stackoverflow.com/a/54487034/20213938
+    template<typename tuple_t>
+    constexpr auto get_array_from_tuple(tuple_t&& tuple)
+    {
+        constexpr auto get_array = [](auto&& ... x){ return cuda::std::array{std::forward<decltype(x)>(x) ... }; };
+        return std::apply(get_array, std::forward<tuple_t>(tuple));
+    }
+
+    template<int Start, int End, typename... Args, std::size_t... I>
+    auto slice_impl(std::index_sequence<I...>, Args&&... args) {
+        return cuda::std::make_tuple(cuda::std::get<Start + I>(cuda::std::forward_as_tuple(args...))...);
+    }
+
+    template<int Start, int End, typename... Args>
+    auto slice(Args&&... args) {
+        static_assert(Start >= 0 && End >= 0 && Start <= End, "Invalid slice indices");
+        return get_array_from_tuple(slice_impl<Start, End>(std::make_index_sequence<End - Start>{}, std::forward<Args>(args)...));
+    }
+
     template <typename OpA, typename OpB>
     class CrossOp : public BaseOp<CrossOp<OpA, OpB>>
     {
@@ -64,27 +84,34 @@ namespace matx
           MATX_STATIC_ASSERT_STR(OpA::Rank() >= 1 && OpB::Rank() >= 1, matxInvalidDim, "Operators to cross() must have rank of at least one.");
 
           for (int32_t i = 0; i < min_rank; i++) {
-            MATX_ASSERT_STR(a_.Size(OpA::Rank() - 1 - i) == b_.Size(OpB::Rank() - 1 - i) , matxInvalidSize, "Operators to cross() must have equal sizes in all dimensions, beginning from the furthest right.");
+            MATX_ASSERT_STR(a_.Size(OpA::Rank() - 1 - i) == b_.Size(OpB::Rank() - 1 - i)  || 
+                            a_.Size(OpA::Rank() - 1 - i) == 1 || 
+                            1 == b_.Size(OpB::Rank() - 1 - i), matxInvalidSize, "Operators to cross() must have equal sizes or be 1 in all dimensions, beginning from the right.");
           }
 
           MATX_ASSERT_STR(a_.Size(OpA::Rank() - 1) == 3 || a_.Size(OpA::Rank() - 1) == 2, matxInvalidSize, "Operator A to cross() must have size 2 or 3.")
-          MATX_ASSERT_STR(b_.Size(OpB::Rank() - 1) == 3 || b_.Size(OpB::Rank() - 1) == 2, matxInvalidSize, "Operator A to cross() must have size 2 or 3.")
+          MATX_ASSERT_STR(b_.Size(OpB::Rank() - 1) == 3 || b_.Size(OpB::Rank() - 1) == 2, matxInvalidSize, "Operator B to cross() must have size 2 or 3.")
+        
+        for (int32_t i = 0; i < out_rank; i++) {
+          if (i < OpA::Rank()){
+            out_dims_[i] = a_.Size(i);
+          }
+          else{
+            out_dims_[i] = b_.Size(i);
+          }
+        }
         };
 
         template <typename... Is>
         __MATX_INLINE__ __MATX_DEVICE__ __MATX_HOST__ decltype(auto) operator()(Is... indices) const
         {
-          cuda::std::array idxA{indices...};
+          cuda::std::array idx{indices...};
           cuda::std::array idxB{indices...};
-
           
-          idx2[Rank() - 2] = pp_get<Rank() - 2>(indices...) % op2_.Size(Rank() - 2);
-          idx2[Rank() - 1] = pp_get<Rank() - 1>(indices...) % op2_.Size(Rank() - 1);
+          cuda::std:array idxA = slice<out_rank-OpA::RANK(),out_rank>(idx);
+          cuda::std:array idxB = slice<out_rank-OpB::RANK(),out_rank>(idx);
 
-          idx1[Rank() - 2] = pp_get<Rank() - 2>(indices...) / op2_.Size(Rank() - 2);
-          idx1[Rank() - 1] = pp_get<Rank() - 1>(indices...) / op2_.Size(Rank() - 1);
-
-          return get_value(op2_, idx2) * get_value(op1_, idx1);
+          return get_value(a_, idxA) * get_value(b_, idxB);
         }
 
         static __MATX_INLINE__ constexpr __MATX_HOST__ __MATX_DEVICE__ int32_t Rank()
@@ -94,7 +121,7 @@ namespace matx
 
         constexpr __MATX_INLINE__ __MATX_HOST__ __MATX_DEVICE__ index_t Size([[maybe_unused]] int dim) const
         {
-          return cuda:;std::max(a_.Size(dim), b_.Size(dim));
+          return out_dims_[dim];
         }
 
         template <typename ShapeType, typename Executor>
