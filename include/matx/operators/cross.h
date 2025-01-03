@@ -97,9 +97,10 @@ namespace matx
           cuda::std::array idx{indices...};
           auto act_ = clone<out_rank>(a_, out_dims_);
           auto bct_ = clone<out_rank>(b_, out_dims_);
-
+            print(act_);
+            print(bct_);
           auto idxC = pp_get<out_rank-1>(indices...);
-
+          print(idxC);
           //create references to individual slices for ease of notation
           cuda::std::array idxA0 = idx;
           cuda::std::array idxA1 = idx;
@@ -111,6 +112,10 @@ namespace matx
           idxA0[out_rank - 1] = 0;
           idxA1[out_rank - 1] = 1;
           idxA2[out_rank - 1] = 2;
+        print(idxA0);
+        print(idxA1);
+        print(idxA2);
+
           idxB0[out_rank - 1] = 0;
           idxB1[out_rank - 1] = 1;
           idxB2[out_rank - 1] = 2;
