@@ -139,7 +139,7 @@ namespace matx
                     );
           }
           else{
-            return get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0);
+            return concat(out_rank, 0, 0, get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0));
           }
         }
         static __MATX_INLINE__ constexpr __MATX_HOST__ __MATX_DEVICE__ int32_t Rank()
