@@ -121,25 +121,25 @@ namespace matx
           bool isA3D = a_.Size(OpA::Rank()-1) == 3 ? true : false;
           bool isB3D = b_.Size(OpB::Rank()-1) == 3 ? true : false;
           if (isA3D && isB3D){
-            return concat(out_rank, get_value(a_,idxA1) * get_value(b_,idxB2) - get_value(a_,idxA2) * get_value(b_,idxB1)
-                                        , get_value(a_,idxA2) * get_value(b_,idxB0) - get_value(a_,idxA0) * get_value(b_,idxB2)
-                                        , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
+            return concat(out_rank, a_(idxA1) * b_(idxB2) - a_(idxA2) * b_(idxB1)
+                                        , a_(idxA2) * b_(idxB0) - a_(idxA0) * b_(idxB2)
+                                        , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
                     );
           }
           else if (isA3D && !isB3D){
-            return concat(out_rank, -get_value(a_,idxA2) * get_value(b_,idxB1)
-                                        , get_value(a_,idxA2) * get_value(b_,idxB0)
-                                        , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
+            return concat(out_rank, -a_(idxA2) * b_(idxB1)
+                                        , a_(idxA2) * b_(idxB0)
+                                        , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
                     );
           }
           else if (!isA3D && isB3D){
-            return concat(out_rank, get_value(a_,idxA1) * get_value(b_,idxB2)
-                                        , -get_value(a_,idxA0) * get_value(b_,idxB2)
-                                        , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
+            return concat(out_rank, a_(idxA1) * b_(idxB2)
+                                        , -a_(idxA0) * b_(idxB2)
+                                        , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
                     );
           }
           else{
-            return concat(out_rank, 0, 0, get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0));
+            return concat(out_rank, 0, 0, a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0));
           }
         }
         static __MATX_INLINE__ constexpr __MATX_HOST__ __MATX_DEVICE__ int32_t Rank()
