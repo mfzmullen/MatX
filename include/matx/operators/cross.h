@@ -80,7 +80,7 @@ namespace matx
         using value_type = typename OpA::value_type;
 
         __MATX_INLINE__ std::string str() const { return "cross()"; }
-        __MATX_INLINE__ CrossOp(const OpA &OpA, const OpB &OpB) : OpA_(OpA), OpB_(OpB) {
+        __MATX_INLINE__ CrossOp(const OpA &A, const OpB &B) : a_(A), b_(OpB) {
           MATX_STATIC_ASSERT_STR(OpA::Rank() >= 1 && OpB::Rank() >= 1, matxInvalidDim, "Operators to cross() must have rank of at least one.");
 
           for (int32_t i = 0; i < min_rank; i++) {
@@ -200,7 +200,7 @@ namespace matx
    * @return cross operator 
    */
   template <typename OpA, typename OpB>
-  __MATX_INLINE__ auto cross(const OpA &OpA, const OpB &OpB) {
-    return detail::CrossOp(OpA, OpB);
+  __MATX_INLINE__ auto cross(const OpA &A, const OpB &B) {
+    return detail::CrossOp(A, B);
   }
 } // end namespace matx
