@@ -54,7 +54,7 @@ namespace matx
 
     template<int Start, int End, typename... Args, std::size_t... I>
     auto array_slice_impl(std::index_sequence<I...>, Args&&... args) {
-        return cuda::std::make_tuple(cuda::std::get<Start + I>(cuda::std::forward_as_tuple(args...))...);
+        return std::make_tuple(std::get<Start + I>(std::forward_as_tuple(args...))...);
     }
 
     template<int Start, int End, typename... Args>
@@ -105,10 +105,10 @@ namespace matx
         template <typename... Is>
         __MATX_INLINE__ __MATX_DEVICE__ __MATX_HOST__ decltype(auto) operator()(Is... indices) const
         {
-          cuda::std::array idx{indices...};
+          // cuda::std::array idx{indices...};
           
-          cuda::std::array idxA = array_slice<out_rank-OpA::Rank(),out_rank>(idx);
-          cuda::std::array idxB = array_slice<out_rank-OpB::Rank(),out_rank>(idx);
+          cuda::std::array idxA = array_slice<out_rank-OpA::Rank(),out_rank>(indices...);
+          cuda::std::array idxB = array_slice<out_rank-OpB::Rank(),out_rank>(indices...);
 
           //create references to individual slices for ease of notation
           cuda::std::array idxA0 = idxA;
