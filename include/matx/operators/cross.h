@@ -98,8 +98,6 @@ namespace matx
           cuda::std::array idx{indices...};
           auto act_ = clone<out_rank>(a_, out_dims_);
           auto bct_ = clone<out_rank>(b_, out_dims_);
-            print(act_);
-            print(bct_);
           auto idxC = pp_get<out_rank-1>(indices...);
 
           //create references to individual slices for ease of notation
@@ -122,16 +120,17 @@ namespace matx
           //we've already checked if the last dim is 2 or 3, so if not 3, must be 2
         //   bool isA3D = a_.Size(OpA::Rank()-1) == 3 ? true : false;
         //   bool isB3D = b_.Size(OpB::Rank()-1) == 3 ? true : false;
+          return act_(idxA0) * bct_(idxB1) - act_(idxA1) * bct_(idxB0);
 
-            if (idxC == 0){
-                return act_(idxA1) * bct_(idxB2) - act_(idxA2) * bct_(idxB1);
-            }
-            else if (idxC == 1){
-                return act_(idxA2) * bct_(idxB0) - act_(idxA0) * bct_(idxB2);
-            }
-            else{
-                return act_(idxA0) * bct_(idxB1) - act_(idxA1) * bct_(idxB0);
-            }  
+            // if (idxC == 0){
+            //     return act_(idxA1) * bct_(idxB2) - act_(idxA2) * bct_(idxB1);
+            // }
+            // else if (idxC == 1){
+            //     return act_(idxA2) * bct_(idxB0) - act_(idxA0) * bct_(idxB2);
+            // }
+            // else{
+            //     return act_(idxA0) * bct_(idxB1) - act_(idxA1) * bct_(idxB0);
+            // }  
           
         }
         static __MATX_INLINE__ constexpr __MATX_HOST__ __MATX_DEVICE__ int32_t Rank()
