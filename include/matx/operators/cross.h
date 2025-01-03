@@ -119,7 +119,6 @@ namespace matx
           idxA1[OpA::Rank() - 1] = 1;
           idxA2[OpA::Rank() - 1] = 2;
 
-          //create references to individual slices for ease of notation
           cuda::std::array idxB0 = idxB;
           cuda::std::array idxB1 = idxB;
           cuda::std::array idxB2 = idxB;
@@ -128,14 +127,32 @@ namespace matx
           idxB1[OpB::Rank() - 1] = 1;
           idxB2[OpB::Rank() - 1] = 2;
 
-          auto result = concat(out_rank, get_value(a_,idxA1) * get_value(b_,idxB2) - get_value(a_,idxA2) * get_value(b_,idxB1)
+          //cases: last size of A = 2, 3, and last size of B = 2, 3
+          //we've already checked if the last dim is 2 or 3, so if not 3, must be 2
+          bool isA3D = a_.Size(OpA::Rank()-1) == 3 ? true : false;
+          bool isB3D = b_.Size(OpB::Rank()-1) == 3 ? true : false;
+          if (isA3D && isB3D){
+            return concat(out_rank, get_value(a_,idxA1) * get_value(b_,idxB2) - get_value(a_,idxA2) * get_value(b_,idxB1)
                                         , get_value(a_,idxA2) * get_value(b_,idxB0) - get_value(a_,idxA0) * get_value(b_,idxB2)
                                         , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
-          )
-
-          return result;
+                    );
+          }
+          else if (isA3D && !isB3D){
+            return concat(out_rank, -get_value(a_,idxA2) * get_value(b_,idxB1)
+                                        , get_value(a_,idxA2) * get_value(b_,idxB0)
+                                        , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
+                    );
+          }
+          else if (!isA3D && isB3D){
+            return concat(out_rank, get_value(a_,idxA1) * get_value(b_,idxB2)
+                                        , -get_value(a_,idxA0) * get_value(b_,idxB2)
+                                        , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
+                    );
+          }
+          else{
+            return get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0);
+          }
         }
-
         static __MATX_INLINE__ constexpr __MATX_HOST__ __MATX_DEVICE__ int32_t Rank()
         {
           return out_rank;
