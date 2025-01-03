@@ -49,7 +49,7 @@ namespace matx
     constexpr auto get_array_from_tuple(tuple_t&& tuple)
     {
         constexpr auto get_array = [](auto&& ... x){ return cuda::std::array{std::forward<decltype(x)>(x) ... }; };
-        return std::apply(get_array, std::forward<tuple_t>(tuple));
+        return cuda::std::apply(get_array, std::forward<tuple_t>(tuple));
     }
 
     template <typename OpA, typename OpB>
