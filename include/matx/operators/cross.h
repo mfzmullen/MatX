@@ -44,24 +44,15 @@ namespace matx
    */
   namespace detail {
 
-    //pulled from here: https://stackoverflow.com/a/54487034/20213938
-    template<typename tuple_t>
-    constexpr auto get_array_from_tuple(tuple_t&& tuple)
-    {
-        constexpr auto get_array = [](auto&& ... x){ return cuda::std::array{std::forward<decltype(x)>(x) ... }; };
-        return std::apply(get_array, std::forward<tuple_t>(tuple));
-    }
+    // //pulled from here: https://stackoverflow.com/a/54487034/20213938
+    // template<typename tuple_t>
+    // constexpr auto get_array_from_tuple(tuple_t&& tuple)
+    // {
+    //     constexpr auto get_array = [](auto&& ... x){ return cuda::std::array{std::forward<decltype(x)>(x) ... }; };
+    //     return std::apply(get_array, std::forward<tuple_t>(tuple));
+    // }
 
-    template<int Start, int End, typename... Args, std::size_t... I>
-    auto array_slice_impl(std::index_sequence<I...>, Args&&... args) {
-        return std::make_tuple(std::get<Start + I>(std::forward_as_tuple(args...))...);
-    }
-
-    template<int Start, int End, typename... Args>
-    auto array_slice(Args&&... args) {
-        static_assert(Start >= 0 && End >= 0 && Start <= End, "Invalid slice indices");
-        return get_array_from_tuple(array_slice_impl<Start, End>(std::make_index_sequence<End - Start>{}, std::forward<Args>(args)...));
-    }
+    
 
     template <typename OpA, typename OpB>
     class CrossOp : public BaseOp<CrossOp<OpA, OpB>>
@@ -107,8 +98,8 @@ namespace matx
         {
           // cuda::std::array idx{indices...};
           
-          cuda::std::array idxA = array_slice<out_rank-OpA::Rank(),out_rank>(indices...);
-          cuda::std::array idxB = array_slice<out_rank-OpB::Rank(),out_rank>(indices...);
+          cuda::std::array idxA {pp_get_range<out_rank-OpA::Rank(),out_rank>(indices...)};
+          cuda::std::array idxB {pp_get_range<out_rank-OpB::Rank(),out_rank>(indices...)};
 
           //create references to individual slices for ease of notation
           cuda::std::array idxA0 = idxA;
@@ -132,25 +123,25 @@ namespace matx
           bool isA3D = a_.Size(OpA::Rank()-1) == 3 ? true : false;
           bool isB3D = b_.Size(OpB::Rank()-1) == 3 ? true : false;
           if (isA3D && isB3D){
-            return concat(out_rank, get_value(a_,idxA1) * get_value(b_,idxB2) - get_value(a_,idxA2) * get_value(b_,idxB1)
-                                        , get_value(a_,idxA2) * get_value(b_,idxB0) - get_value(a_,idxA0) * get_value(b_,idxB2)
-                                        , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
+            return concat(out_rank, get_value(cuda::std::forward<decltype(a_)>(a_),idxA1) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB2) - get_value(cuda::std::forward<decltype(a_)>(a_),idxA2) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB1)
+                                        , get_value(cuda::std::forward<decltype(a_)>(a_),idxA2) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB0) - get_value(cuda::std::forward<decltype(a_)>(a_),idxA0) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB2)
+                                        , get_value(cuda::std::forward<decltype(a_)>(a_),idxA0) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB1) - get_value(cuda::std::forward<decltype(a_)>(a_),idxA1) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB0)
                     );
           }
           else if (isA3D && !isB3D){
-            return concat(out_rank, -get_value(a_,idxA2) * get_value(b_,idxB1)
-                                        , get_value(a_,idxA2) * get_value(b_,idxB0)
-                                        , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
+            return concat(out_rank, -get_value(cuda::std::forward<decltype(a_)>(a_),idxA2) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB1)
+                                        , get_value(cuda::std::forward<decltype(a_)>(a_),idxA2) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB0)
+                                        , get_value(cuda::std::forward<decltype(a_)>(a_),idxA0) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB1) - get_value(cuda::std::forward<decltype(a_)>(a_),idxA1) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB0)
                     );
           }
           else if (!isA3D && isB3D){
-            return concat(out_rank, get_value(a_,idxA1) * get_value(b_,idxB2)
-                                        , -get_value(a_,idxA0) * get_value(b_,idxB2)
-                                        , get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0)
+            return concat(out_rank, get_value(cuda::std::forward<decltype(a_)>(a_),idxA1) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB2)
+                                        , -get_value(cuda::std::forward<decltype(a_)>(a_),idxA0) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB2)
+                                        , get_value(cuda::std::forward<decltype(a_)>(a_),idxA0) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB1) - get_value(cuda::std::forward<decltype(a_)>(a_),idxA1) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB0)
                     );
           }
           else{
-            return get_value(a_,idxA0) * get_value(b_,idxB1) - get_value(a_,idxA1) * get_value(b_,idxB0);
+            return get_value(cuda::std::forward<decltype(a_)>(a_),idxA0) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB1) - get_value(cuda::std::forward<decltype(a_)>(a_),idxA1) * get_value(cuda::std::forward<decltype(b_)>(b_),idxB0);
           }
         }
         static __MATX_INLINE__ constexpr __MATX_HOST__ __MATX_DEVICE__ int32_t Rank()

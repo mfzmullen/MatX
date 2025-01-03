@@ -904,6 +904,18 @@ __MATX_DEVICE__ __MATX_HOST__ decltype(auto) pp_get(Ts&&... ts) {
   return cuda::std::get<I>(cuda::std::forward_as_tuple(ts...));
 }
 
+// Get the n-th through m-th element from a parameter pack
+template<int Start, int End, typename... Args, std::size_t... I>
+auto pp_get_range_impl(std::index_sequence<I...>, Args&&... args) {
+    return cuda::std::make_tuple(cuda::std::get<Start + I>(cuda::std::forward_as_tuple(args...))...);
+}
+
+template<int Start, int End, typename... Args>
+auto pp_get_range(Args&&... args) {
+    static_assert(Start >= 0 && End >= 0 && Start <= End, "Invalid slice indices");
+    return pp_get_range_impl<Start, End>(std::make_index_sequence<End - Start>{}, std::forward<Args>(args)...);
+}
+
 template <std::size_t ... Is>
 constexpr auto index_sequence_rev(std::index_sequence<Is...> const &)
    -> decltype( std::index_sequence<sizeof...(Is) -1U - Is...>{} );
