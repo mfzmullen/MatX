@@ -138,9 +138,7 @@ namespace matx
                                         , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
                     );
           }
-          else{
-            return concat(out_rank, 0, 0, a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0));
-          }
+          
         }
         static __MATX_INLINE__ constexpr __MATX_HOST__ __MATX_DEVICE__ int32_t Rank()
         {
