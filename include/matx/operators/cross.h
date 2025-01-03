@@ -107,7 +107,7 @@ namespace matx
             print(act_);
             print(bct_);
           auto idxC = pp_get<out_rank-1>(indices...);
-          doPrint(idxC);
+          doPrint(std::cout, idxC);
 
           //create references to individual slices for ease of notation
           cuda::std::array idxA0 = idx;
@@ -120,9 +120,9 @@ namespace matx
           idxA0[out_rank - 1] = 0;
           idxA1[out_rank - 1] = 1;
           idxA2[out_rank - 1] = 2;
-        doPrint(idxA0);
-        doPrint(idxA1);
-        doPrint(idxA2);
+        doPrint(std::cout,idxA0);
+        doPrint(std::cout,idxA1);
+        doPrint(std::cout,idxA2);
 
           idxB0[out_rank - 1] = 0;
           idxB1[out_rank - 1] = 1;
