@@ -90,6 +90,9 @@ namespace matx
             out_dims_[i] = b_.Size(i);
           }
         }
+        print(a_);
+        print(b_);
+
         };
 
         template <typename... Is>
