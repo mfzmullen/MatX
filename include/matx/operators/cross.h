@@ -52,6 +52,13 @@ namespace matx
         return cuda::std::apply(get_array, std::forward<tuple_t>(tuple));
     }
 
+    template <typename Arg, typename... Args>
+    void doPrint(std::ostream& out, Arg&& arg, Args&&... args)
+    {
+        out << std::forward<Arg>(arg);
+        ((out << ',' << std::forward<Args>(args)), ...);
+    }
+
     template <typename OpA, typename OpB>
     class CrossOp : public BaseOp<CrossOp<OpA, OpB>>
     {
@@ -100,7 +107,8 @@ namespace matx
             print(act_);
             print(bct_);
           auto idxC = pp_get<out_rank-1>(indices...);
-          print(idxC);
+          doPrint(idxC);
+
           //create references to individual slices for ease of notation
           cuda::std::array idxA0 = idx;
           cuda::std::array idxA1 = idx;
@@ -112,9 +120,9 @@ namespace matx
           idxA0[out_rank - 1] = 0;
           idxA1[out_rank - 1] = 1;
           idxA2[out_rank - 1] = 2;
-        print(idxA0);
-        print(idxA1);
-        print(idxA2);
+        doPrint(idxA0);
+        doPrint(idxA1);
+        doPrint(idxA2);
 
           idxB0[out_rank - 1] = 0;
           idxB1[out_rank - 1] = 1;
