@@ -127,7 +127,7 @@ namespace matx
                     );
           }
           else if (isA3D && !isB3D){
-            return cuda::std::make_tuple(out_rank, -a_(idxA2) * b_(idxB1)
+            return cuda::std::make_tuple(-a_(idxA2) * b_(idxB1)
                                         , a_(idxA2) * b_(idxB0)
                                         , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
                     );
