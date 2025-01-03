@@ -121,9 +121,9 @@ namespace matx
           bool isA3D = a_.Size(OpA::Rank()-1) == 3 ? true : false;
           bool isB3D = b_.Size(OpB::Rank()-1) == 3 ? true : false;
           if (isA3D && isB3D){
-            return concat(out_rank, get_value(cuda::std::forward<OpA>(A),idxA1) * get_value(cuda::std::forward<OpB>(B),idxB2) - get_value(cuda::std::forward<OpA>(A),idxA2) * get_value(cuda::std::forward<OpB>(B),idxB1)
-                                        , get_value(cuda::std::forward<OpA>(A),idxA2) * get_value(cuda::std::forward<OpB>(B),idxB0) - get_value(cuda::std::forward<OpA>(A),idxA0) * get_value(cuda::std::forward<OpB>(B),idxB2)
-                                        , get_value(cuda::std::forward<OpA>(A),idxA0) * get_value(cuda::std::forward<OpB>(B),idxB1) - get_value(cuda::std::forward<OpA>(A),idxA1) * get_value(cuda::std::forward<OpB>(B),idxB0)
+            return concat(out_rank, get_value(cuda::std::forward<OpA>(a_),idxA1) * get_value(cuda::std::forward<OpB>(B),idxB2) - get_value(cuda::std::forward<OpA>(a_),idxA2) * get_value(cuda::std::forward<OpB>(B),idxB1)
+                                        , get_value(cuda::std::forward<OpA>(a_),idxA2) * get_value(cuda::std::forward<OpB>(B),idxB0) - get_value(cuda::std::forward<OpA>(a_),idxA0) * get_value(cuda::std::forward<OpB>(B),idxB2)
+                                        , get_value(cuda::std::forward<OpA>(a_),idxA0) * get_value(cuda::std::forward<OpB>(B),idxB1) - get_value(cuda::std::forward<OpA>(a_),idxA1) * get_value(cuda::std::forward<OpB>(B),idxB0)
                     );
           }
           else if (isA3D && !isB3D){
