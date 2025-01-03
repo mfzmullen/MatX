@@ -80,7 +80,7 @@ namespace matx
         using value_type = typename OpA::value_type;
 
         __MATX_INLINE__ std::string str() const { return "cross()"; }
-        __MATX_INLINE__ CrossOp(const OpA &A, const OpB &B) : a_(A), b_(OpB) {
+        __MATX_INLINE__ CrossOp(const OpA &A, const OpB &B) : a_(A), b_(B) {
           MATX_STATIC_ASSERT_STR(OpA::Rank() >= 1 && OpB::Rank() >= 1, matxInvalidDim, "Operators to cross() must have rank of at least one.");
 
           for (int32_t i = 0; i < min_rank; i++) {
@@ -107,8 +107,8 @@ namespace matx
         {
           cuda::std::array idx{indices...};
           
-          cuda::std:array idxA = array_slice<out_rank-OpA::Rank(),out_rank>(idx);
-          cuda::std:array idxB = array_slice<out_rank-OpB::Rank(),out_rank>(idx);
+          cuda::std::array idxA = array_slice<out_rank-OpA::Rank(),out_rank>(idx);
+          cuda::std::array idxB = array_slice<out_rank-OpB::Rank(),out_rank>(idx);
 
           //create references to individual slices for ease of notation
           cuda::std::array idxA0 = idxA;
