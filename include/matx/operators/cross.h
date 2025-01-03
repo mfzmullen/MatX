@@ -121,19 +121,19 @@ namespace matx
           bool isA3D = a_.Size(OpA::Rank()-1) == 3 ? true : false;
           bool isB3D = b_.Size(OpB::Rank()-1) == 3 ? true : false;
           if (isA3D && isB3D){
-            return concat(out_rank, a_(idxA1) * b_(idxB2) - a_(idxA2) * b_(idxB1)
+            return cuda::std::make_tuple(a_(idxA1) * b_(idxB2) - a_(idxA2) * b_(idxB1)
                                         , a_(idxA2) * b_(idxB0) - a_(idxA0) * b_(idxB2)
                                         , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
                     );
           }
           else if (isA3D && !isB3D){
-            return concat(out_rank, -a_(idxA2) * b_(idxB1)
+            return cuda::std::make_tuple(out_rank, -a_(idxA2) * b_(idxB1)
                                         , a_(idxA2) * b_(idxB0)
                                         , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
                     );
           }
           else if (!isA3D && isB3D){
-            return concat(out_rank, a_(idxA1) * b_(idxB2)
+            return cuda::std::make_tuple(a_(idxA1) * b_(idxB2)
                                         , -a_(idxA0) * b_(idxB2)
                                         , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
                     );
