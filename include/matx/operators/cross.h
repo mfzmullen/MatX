@@ -98,6 +98,7 @@ namespace matx
           
           cuda::std::array idxA = get_array_from_tuple(pp_get_range<out_rank-OpA::Rank(),out_rank>(indices...));
           cuda::std::array idxB = get_array_from_tuple(pp_get_range<out_rank-OpB::Rank(),out_rank>(indices...));
+          auto idxC = pp_get<out_rank-1>(indices...);
 
           //create references to individual slices for ease of notation
           cuda::std::array idxA0 = idxA;
@@ -120,24 +121,16 @@ namespace matx
           //we've already checked if the last dim is 2 or 3, so if not 3, must be 2
           bool isA3D = a_.Size(OpA::Rank()-1) == 3 ? true : false;
           bool isB3D = b_.Size(OpB::Rank()-1) == 3 ? true : false;
-          if (isA3D && isB3D){
-            return cuda::std::make_tuple(a_(idxA1) * b_(idxB2) - a_(idxA2) * b_(idxB1)
-                                        , a_(idxA2) * b_(idxB0) - a_(idxA0) * b_(idxB2)
-                                        , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
-                    );
-          }
-          else if (isA3D && !isB3D){
-            return cuda::std::make_tuple(-a_(idxA2) * b_(idxB1)
-                                        , a_(idxA2) * b_(idxB0)
-                                        , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
-                    );
-          }
-          else if (!isA3D && isB3D){
-            return cuda::std::make_tuple(a_(idxA1) * b_(idxB2)
-                                        , -a_(idxA0) * b_(idxB2)
-                                        , a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0)
-                    );
-          }
+
+            if (idxC == 0){
+                return a_(idxA1) * b_(idxB2) - a_(idxA2) * b_(idxB1);
+            }
+            else if (idxC == 1){
+                return a_(idxA2) * b_(idxB0) - a_(idxA0) * b_(idxB2);
+            }
+            else{
+                return a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0);
+            }  
           
         }
         static __MATX_INLINE__ constexpr __MATX_HOST__ __MATX_DEVICE__ int32_t Rank()
