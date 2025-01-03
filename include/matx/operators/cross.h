@@ -121,13 +121,13 @@ namespace matx
         //   bool isB3D = b_.Size(OpB::Rank()-1) == 3 ? true : false;
 
             if (idxC == 0){
-                return a_(idxA1) * b_(idxB2) - a_(idxA2) * b_(idxB1);
+                return act_(idxA1) * bct_(idxB2) - act_(idxA2) * bct_(idxB1);
             }
             else if (idxC == 1){
-                return a_(idxA2) * b_(idxB0) - a_(idxA0) * b_(idxB2);
+                return act_(idxA2) * bct_(idxB0) - act_(idxA0) * bct_(idxB2);
             }
             else{
-                return a_(idxA0) * b_(idxB1) - a_(idxA1) * b_(idxB0);
+                return act_(idxA0) * bct_(idxB1) - act_(idxA1) * bct_(idxB0);
             }  
           
         }
