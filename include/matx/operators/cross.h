@@ -44,15 +44,13 @@ namespace matx
    */
   namespace detail {
 
-    // //pulled from here: https://stackoverflow.com/a/54487034/20213938
-    // template<typename tuple_t>
-    // constexpr auto get_array_from_tuple(tuple_t&& tuple)
-    // {
-    //     constexpr auto get_array = [](auto&& ... x){ return cuda::std::array{std::forward<decltype(x)>(x) ... }; };
-    //     return std::apply(get_array, std::forward<tuple_t>(tuple));
-    // }
-
-    
+    //pulled from here: https://stackoverflow.com/a/54487034/20213938
+    template<typename tuple_t>
+    constexpr auto get_array_from_tuple(tuple_t&& tuple)
+    {
+        constexpr auto get_array = [](auto&& ... x){ return cuda::std::array{std::forward<decltype(x)>(x) ... }; };
+        return std::apply(get_array, std::forward<tuple_t>(tuple));
+    }
 
     template <typename OpA, typename OpB>
     class CrossOp : public BaseOp<CrossOp<OpA, OpB>>
@@ -98,7 +96,7 @@ namespace matx
         {
           // cuda::std::array idx{indices...};
           
-          cuda::std::array idxA {pp_get_range<out_rank-OpA::Rank(),out_rank>(indices...)};
+          cuda::std::array idxA get_array_from_tuple(pp_get_range<out_rank-OpA::Rank(),out_rank>(indices...));
           cuda::std::array idxB {pp_get_range<out_rank-OpB::Rank(),out_rank>(indices...)};
 
           //create references to individual slices for ease of notation
