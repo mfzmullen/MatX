@@ -99,9 +99,9 @@ namespace matx
         __MATX_INLINE__ __MATX_DEVICE__ __MATX_HOST__ decltype(auto) operator()(Is... indices) const
         {
           cuda::std::array idx{indices...};
-        //   auto act_ = clone<out_rank>(a_, out_dims_);
-        //   auto bct_ = clone<out_rank>(b_, out_dims_);
-        //   auto idxC = pp_get<out_rank-1>(indices...);
+          auto act_ = clone<out_rank>(a_, out_dims_);
+          auto bct_ = clone<out_rank>(b_, out_dims_);
+          auto idxC = pp_get<out_rank-1>(indices...);
 
           //create references to individual slices for ease of notation
           cuda::std::array idxA0 = idx;
