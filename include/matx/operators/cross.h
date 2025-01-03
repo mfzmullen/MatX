@@ -97,7 +97,7 @@ namespace matx
           // cuda::std::array idx{indices...};
           
           cuda::std::array idxA = get_array_from_tuple(pp_get_range<out_rank-OpA::Rank(),out_rank>(indices...));
-          cuda::std::array idxB {pp_get_range<out_rank-OpB::Rank(),out_rank>(indices...)};
+          cuda::std::array idxB = get_array_from_tuple(pp_get_range<out_rank-OpB::Rank(),out_rank>(indices...));
 
           //create references to individual slices for ease of notation
           cuda::std::array idxA0 = idxA;
