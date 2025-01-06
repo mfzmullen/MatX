@@ -43,6 +43,9 @@ namespace matx
       class CloneOp : public BaseOp<CloneOp<CRank, T>>
     {
       static_assert(CRank > T::Rank(), "Clone rank must be higher than input rank");
+      std::cout << CRank;
+      std::cout << T::Rank();
+      
       private:
         mutable typename detail::base_type_t<T> op_;
         cuda::std::array<index_t, CRank> sizes_;         // size of each dimension after cloning
