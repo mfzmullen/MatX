@@ -107,7 +107,7 @@ namespace matx
             bc.fill(matxKeepDim);
 
             for (int idx = cuda::std::min(a_.Rank(), b_.Rank()); idx < out_rank; idx++){
-                if (idx <= A.Rank()-1 && idx <= B.Rank()-1){
+                if (idx <= a_.Rank()-1 && idx <= b_.Rank()-1){
                     ac[out_rank - idx] = cuda::std::max(a_.Size(out_rank - idx), b_.Size(out_rank - idx)); 
                     bc[out_rank - idx] = cuda::std::max(a_.Size(out_rank - idx), b_.Size(out_rank - idx)); 
                 }
