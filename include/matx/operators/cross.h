@@ -113,8 +113,8 @@ namespace matx
                 }
             }
 
-          auto act_ = clone<out_rank>(a_, ac);
-          auto bct_ = clone<out_rank>(b_, bc);
+          //auto act_ = clone<out_rank>(a_, ac);
+          //auto bct_ = clone<out_rank>(b_, bc);
         //   auto idxC = pp_get<out_rank-1>(indices...);
 
           //create references to individual slices for ease of notation
