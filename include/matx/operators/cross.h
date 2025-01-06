@@ -137,7 +137,7 @@ namespace matx
           //we've already checked if the last dim is 2 or 3, so if not 3, must be 2
         //   bool isA3D = a_.Size(OpA::Rank()-1) == 3 ? true : false;
         //   bool isB3D = b_.Size(OpB::Rank()-1) == 3 ? true : false;
-          return get_value(a_, idx);
+          return get_value(a_, indices);
 
             // if (idxC == 0){
             //     return act_(idxA1) * bct_(idxB2) - act_(idxA2) * bct_(idxB1);
