@@ -76,7 +76,7 @@ namespace matx
           for (int32_t i = 0; i < min_rank; i++) {
             MATX_ASSERT_STR(a_.Size(OpA::Rank() - 1 - i) == b_.Size(OpB::Rank() - 1 - i)  || 
                             a_.Size(OpA::Rank() - 1 - i) == 1 || 
-                            1 == b_.Size(OpB::Rank() - 1 - i), matxInvalidSize, "Operators to cross() must have equal sizes or be 1 in all dimensions, beginning from the right.");
+                            1 == b_.Size(OpB::Rank() - 1 - i), matxInvalidSize, "A and B tensors must match batch sizes.");
           }
 
           MATX_ASSERT_STR(a_.Size(OpA::Rank() - 1) == 3 || a_.Size(OpA::Rank() - 1) == 2, matxInvalidSize, "Operator A to cross() must have size 2 or 3.")
@@ -99,8 +99,22 @@ namespace matx
         __MATX_INLINE__ __MATX_DEVICE__ __MATX_HOST__ decltype(auto) operator()(Is... indices) const
         {
           cuda::std::array idx{indices...};
-        //   auto act_ = clone<out_rank>(a_, out_dims_);
-        //   auto bct_ = clone<out_rank>(b_, out_dims_);
+
+            cuda::std::array<index_t, out_rank> ac;
+            cuda::std::array<index_t, out_rank> bc;
+
+            ac.fill(matxKeepDim);
+            bc.fill(matxKeepDim);
+
+            for (int idx = cuda::std::min(a_.Rank(), b_.Rank()); idx < out_rank; idx++){
+                if (idx <= A.Rank()-1 && idx <= B.Rank()-1){
+                    ac[out_rank - idx] = cuda::std::max(a_.Size(out_rank - idx), b_.Size(out_rank - idx)); 
+                    bc[out_rank - idx] = cuda::std::max(a_.Size(out_rank - idx), b_.Size(out_rank - idx)); 
+                }
+            }
+
+          auto act_ = clone<out_rank>(a_, ac);
+          auto bct_ = clone<out_rank>(b_, bc);
         //   auto idxC = pp_get<out_rank-1>(indices...);
 
           //create references to individual slices for ease of notation
